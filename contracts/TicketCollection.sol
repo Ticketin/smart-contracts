@@ -42,7 +42,9 @@ contract TicketCollection is ERC721, Ownable {
     }
 
     // TODO: Decide if we want to allow batch minting, so the user can mint more than one ticket at a time
-    function safeMint(address to) public returns (uint) {
+    function safeMint(address to) public payable returns (uint) {
+        require(msg.value >= ticketPrice, "price not met");
+        
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
