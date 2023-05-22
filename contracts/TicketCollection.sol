@@ -33,11 +33,6 @@ contract TicketCollection is ERC721, Ownable {
     //         "https://ipfs.io/ipfs/Qmf7PZU8NiWsWRzoUFtLB6bKJsheX44qENvaCoeBKYWNEo/";
     // }
 
-    function testGet() public returns (uint) {
-        uint returnval = totalSupply + 1;
-        return returnval;
-    }
-
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
     }
