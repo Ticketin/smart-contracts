@@ -44,7 +44,11 @@ contract TicketCollection is ERC721, Ownable {
     // TODO: Decide if we want to allow batch minting, so the user can mint more than one ticket at a time
     function safeMint(address to) public payable returns (uint) {
         require(msg.value >= ticketPrice, "price not met");
-        
+        require(
+            _tokenIdCounter.current() < totalSupply,
+            "all ticket's have been sold"
+        );
+
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
@@ -55,5 +59,13 @@ contract TicketCollection is ERC721, Ownable {
     // Get token Id for admin to see total amount of tickets sold
     function getTokenId() public view returns (uint256) {
         return _tokenIdCounter.current();
+    }
+
+    // function for the owner to withdraw the funds from the contract
+    function withdraw() public payable onlyOwner {
+        (bool txSuccess, ) = payable(owner()).call{
+            value: address(this).balance
+        }("");
+        require(txSuccess, "withdraw failed");
     }
 }
