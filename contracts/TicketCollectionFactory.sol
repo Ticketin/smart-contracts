@@ -38,9 +38,21 @@ contract TicketCollectionFactory {
         ticketCollection.transferOwnership(msg.sender);
 
         adminToCollection[msg.sender] = address(ticketCollection);
+        // adminToCollection[msg.sender].push(address(ticketCollection));
         idToCollection[collectionCounter.current()] = address(ticketCollection);
         collectionCounter.increment();
 
         return address(ticketCollection);
     }
+
+    // https://coinsbench.com/how-to-get-array-data-in-solidity-without-using-for-loop-6c023fbd5896
+    // function getDeployedCollections() public view returns (address[] memory) {
+    //     address[] memory ticketCollectionAddresses = new address[](
+    //         adminToCollection[msg.sender].length
+    //     );
+    //     for (uint i = 0; i < adminToCollection[msg.sender].length; i++) {
+    //         ticketCollectionAddresses[i] = adminToCollection[msg.sender][i];
+    //     }
+    //     return ticketCollectionAddresses;
+    // }
 }
