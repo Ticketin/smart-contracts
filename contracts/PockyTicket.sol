@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import {ERC721Enumerable, ERC721, IERC721Metadata} from '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
 import {AccessControl} from '@openzeppelin/contracts/access/AccessControl.sol';
-import {PockeyCollections} from './PockeyCollections.sol';
+import {PockyCollections} from './PockyCollections.sol';
 
 /**
  * @dev A ERC721 dNFT token contract for Pocky Ticket, powered by Chainlink.
@@ -16,11 +16,11 @@ contract Ticket is ERC721Enumerable, AccessControl {
   bytes32 public constant MINTER_ROLE = keccak256('MINTER_ROLE');
 
   /** @dev PockeyCollections contract, which is a module responsible for managing the dNFT metadata */
-  PockeyCollections public collections;
+  PockyCollections public collections;
 
   mapping(uint256 => uint256) private _tokenIdToCollectionId;
 
-  constructor(PockeyCollections _collections) ERC721Enumerable() ERC721(TOKEN_NAME, SYMBOL) {
+  constructor(PockyCollections _collections) ERC721Enumerable() ERC721(TOKEN_NAME, SYMBOL) {
     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     _setupRole(MINTER_ROLE, msg.sender);
 
@@ -55,7 +55,7 @@ contract Ticket is ERC721Enumerable, AccessControl {
   }
 
   /** @dev returns the collection data of given token. */
-  function collectionOf(uint256 tokenId) public view returns (PockeyCollections.Collection memory) {
+  function collectionOf(uint256 tokenId) public view returns (PockyCollections.Collection memory) {
     require(_exists(tokenId), 'query for nonexistent token');
     return collections.get(_tokenIdToCollectionId[tokenId]);
   }

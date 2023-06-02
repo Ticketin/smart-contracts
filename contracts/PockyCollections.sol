@@ -12,7 +12,7 @@ import {TicketSVGRenderer} from './TicketSVGRenderer.sol';
  *
  * The frontend app should use it for serving available drops/collections.
  */
-contract PockeyCollections is AccessControl {
+contract PockyCollections is AccessControl {
   /** @dev REGISTRAR_ROLE is admin user, who can register a collection. */
   bytes32 public constant REGISTRAR_ROLE = keccak256('REGISTRAR_ROLE');
 
