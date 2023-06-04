@@ -27,6 +27,10 @@ contract PockyCollections is AccessControl {
     string category;
     /** ticket price */
     uint256 priceInETH;
+
+    /** the collection owner. only the owner can withdraw the revenue */
+    address owner;
+
     // —————— date-related fields
     // NOTE: time-sensitive sections such as Now, Upcoming should be categorized in
     // the frontend by parsing startDate / endDate. Here are the cases:
