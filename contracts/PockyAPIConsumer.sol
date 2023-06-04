@@ -83,32 +83,37 @@ contract PockyAPIConsumer is ChainlinkClient, ConfirmedOwner {
     string memory homeTPM,
     string memory homeTPP,
     string memory homeFTM,
-    string memory homeFTP,
-    string memory awayScore,
-    string memory awayFGM,
-    string memory awayFGP,
-    string memory awayTPM,
-    string memory awayTPP,
-    string memory awayFTM,
-    string memory awayFTP
-  ) public recordChainlinkFulfillment(_requestId) {
-    uint256 collectionId = requestIdToCollectionId[_requestId];
-    collections.updateResult(collectionId, PockyCollections.OracleResult({
-      homeScore: homeScore,
-      homeFGM: homeFGM,
-      homeFGP: homeFGP,
-      homeTPM: homeTPM,
-      homeTPP: homeTPP,
-      homeFTM: homeFTM,
-      homeFTP: homeFTP,
-      awayScore: awayScore,
-      awayFGM: awayFGM,
-      awayFGP: awayFGP,
-      awayTPM: awayTPM,
-      awayTPP: awayTPP,
-      awayFTM: awayFTM,
-      awayFTP: awayFTP
-    }));
+    string memory homeFTP
+  )
+    public
+    // string memory awayScore,
+    // string memory awayFGM,
+    // string memory awayFGP,
+    // string memory awayTPM,
+    // string memory awayTPP,
+    // string memory awayFTM
+    recordChainlinkFulfillment(_requestId)
+  {
+    collections.updateResult(
+      requestIdToCollectionId[_requestId],
+      PockyCollections.OracleResult({
+        homeScore: homeScore,
+        homeFGM: homeFGM,
+        homeFGP: homeFGP,
+        homeTPM: homeTPM,
+        homeTPP: homeTPP,
+        homeFTM: homeFTM,
+        homeFTP: homeFTP,
+        awayScore: '',
+        awayFGM: '',
+        awayFGP: '',
+        awayTPM: '',
+        awayTPP: '',
+        awayFTM: '',
+        awayFTP: ''
+        // awayFTP: awayFTP
+      })
+    );
   }
 
   /**
