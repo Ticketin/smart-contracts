@@ -25,6 +25,8 @@ contract PockyCollections is AccessControl {
     string name;
     /** Category (e.g. Concert, Voucher) */
     string category;
+    /** ticket price */
+    uint256 priceInETH;
     // —————— date-related fields
     // NOTE: time-sensitive sections such as Now, Upcoming should be categorized in
     // the frontend by parsing startDate / endDate. Here are the cases:
@@ -41,6 +43,8 @@ contract PockyCollections is AccessControl {
     uint256 startDate;
     /** end date, in POSIX time (millis) */
     uint256 endDate;
+    /** YYYYMMDD */
+    string matchDate;
     // —————— metadata
 
     /** The summary of the location where the event held. shown in ticket image */
@@ -49,15 +53,37 @@ contract PockyCollections is AccessControl {
     string description;
     /** Banner image URL. */
     string imageUrl;
-    /** Background image shown in the ticket. TODO: discuss about final ticket designs with @Mean */
-    string backgroundUrl;
     /** Should be listed in the top of the main page? */
     bool featured;
     // —————— result-related fields
     /** Whether the result is updated. */
     bool updated;
     /** The updated result (by Chainlink oracle) */
-    string eventResult;
+    OracleResult eventResult;
+  }
+
+  struct OracleMetadata {
+    string homeTeamName;
+    string homeTeamSymbol;
+    string homeTeamLogo;
+    string homeTeamColor;
+  }
+
+  struct OracleResult {
+    string homeScore;
+    string homeFGM;
+    string homeFGP;
+    string homeTPM;
+    string homeTPP;
+    string homeFTM;
+    string homeFTP;
+    string awayScore;
+    string awayFGM;
+    string awayFGP;
+    string awayTPM;
+    string awayTPP;
+    string awayFTM;
+    string awayFTP;
   }
 
   Collection[] private _collections;
@@ -95,15 +121,15 @@ contract PockyCollections is AccessControl {
     return _collections;
   }
 
-    /**
+  /**
    * @dev Updates a event result of a collection. Should have {@link RESULT_ORACLE_ROLE} (i.e. Oracle!)
    * @notice This function is called by Chainlink Oracle.
    * @param collectionId The collection you want to update
-   * @param eventResult The event result
+   * @param result The event result
    */
-  function updateResult(uint256 collectionId, string calldata eventResult) external onlyRole(RESULT_ORACLE_ROLE) {
+  function updateResult(uint256 collectionId, OracleResult calldata result) external onlyRole(RESULT_ORACLE_ROLE) {
     require(exists(collectionId), 'collection does not exist');
-    _collections[collectionId].eventResult = eventResult;
+    _collections[collectionId].eventResult = result;
     _collections[collectionId].updated = true;
   }
 
@@ -113,6 +139,7 @@ contract PockyCollections is AccessControl {
    * @param collectionId the collection ID
    */
   function constructTokenURIOf(uint256 collectionId) external view returns (string memory) {
+    // TODO: ticket design needs to be changed.
     Collection storage collection = _collections[collectionId];
     string memory image = Base64.encode(
       bytes(
@@ -122,10 +149,10 @@ contract PockyCollections is AccessControl {
             description1: collection.dateText,
             description2: collection.eventLocation,
             foregroundColor: 'white',
-            backgroundImage: collection.backgroundUrl,
+            backgroundImage: 'black',
             contentImage: collection.imageUrl,
-            hasResult: bytes(collection.eventResult).length > 0,
-            resultText: collection.eventResult
+            hasResult: collection.updated,
+            resultText: collection.eventResult.homeScore
           })
         )
       )
