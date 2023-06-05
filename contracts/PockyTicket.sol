@@ -38,7 +38,7 @@ contract Ticket is ERC721Enumerable, AccessControl {
   function mint(uint256 collectionId, address to) external onlyRole(MINTER_ROLE) {
     PockyCollections.Collection memory collection = collections.get(collectionId);
     require(block.timestamp <= collection.endDate / 1000, 'event has already ended');
-    require(_totalSupplyPerCollectionId[collectionId] >= collection.maxSupply, 'sold out');
+    require(_totalSupplyPerCollectionId[collectionId] < collection.maxSupply, 'sold out');
 
     uint256 tokenId = totalSupply() + 1;
     _mint(to, tokenId);
