@@ -31,6 +31,9 @@ contract PockyCollections is AccessControl {
     /** the collection owner. only the owner can withdraw the revenue */
     address owner;
 
+    /** the maximum count (mint cap) of tickets per a collection */
+    uint256 maxSupply;
+
     // —————— date-related fields
     // NOTE: time-sensitive sections such as Now, Upcoming should be categorized in
     // the frontend by parsing startDate / endDate. Here are the cases:

@@ -36,8 +36,9 @@ contract Ticket is ERC721Enumerable, AccessControl {
    * @param to The beneficiary address to receive the minted token.
    */
   function mint(uint256 collectionId, address to) external onlyRole(MINTER_ROLE) {
-    require(collections.exists(collectionId), 'collection does not exist');
-    require(block.timestamp <= collections.get(collectionId).endDate / 1000, 'event has already ended');
+    PockyCollections.Collection memory collection = collections.get(collectionId);
+    require(block.timestamp <= collection.endDate / 1000, 'event has already ended');
+    require(_totalSupplyPerCollectionId[collectionId] >= collection.maxSupply, 'sold out');
 
     uint256 tokenId = totalSupply() + 1;
     _mint(to, tokenId);
