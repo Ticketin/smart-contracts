@@ -19,6 +19,7 @@ contract Ticket is ERC721Enumerable, AccessControl {
   PockyCollections public collections;
 
   mapping(uint256 => uint256) private _tokenIdToCollectionId;
+  mapping(uint256 => uint256) private _totalSupplyPerCollectionId;
 
   constructor(PockyCollections _collections) ERC721Enumerable() ERC721(TOKEN_NAME, SYMBOL) {
     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -41,6 +42,7 @@ contract Ticket is ERC721Enumerable, AccessControl {
     uint256 tokenId = totalSupply() + 1;
     _mint(to, tokenId);
     _tokenIdToCollectionId[tokenId] = collectionId;
+    _totalSupplyPerCollectionId[collectionId] += 1;
   }
 
   /**
@@ -58,6 +60,11 @@ contract Ticket is ERC721Enumerable, AccessControl {
   function collectionOf(uint256 tokenId) public view returns (PockyCollections.Collection memory) {
     require(_exists(tokenId), 'query for nonexistent token');
     return collections.get(_tokenIdToCollectionId[tokenId]);
+  }
+
+  /** @dev returns the total supply of the collection */
+  function totalSupplyOfCollection(uint256 collectionId) public view returns (uint256) {
+    return _totalSupplyPerCollectionId[collectionId];
   }
 
   /** @dev See {IERC165-supportsInterface}. */

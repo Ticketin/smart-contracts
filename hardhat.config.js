@@ -5,9 +5,7 @@ require('@nomicfoundation/hardhat-network-helpers');
 require('hardhat-deploy');
 require('dotenv').config();
 
-const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL;
-const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
-const POLYGON_MUMBAI_RPC_URL = process.env.POLYGON_MUMBAI_RPC_URL;
+const POLYGON_MUMBAI_RPC_URL = process.env.POLYGON_MUMBAI_RPC_URL || '';
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
@@ -23,16 +21,6 @@ module.exports = {
       //     auto: false,
       //     interval: 5000,
       // },
-    },
-    goerli: {
-      url: GOERLI_RPC_URL,
-      accounts: [PRIVATE_KEY],
-      chainId: 5,
-    },
-    sepolia: {
-      url: SEPOLIA_RPC_URL,
-      accounts: [PRIVATE_KEY],
-      chainId: 11155111,
     },
     polygonMumbai: {
       url: POLYGON_MUMBAI_RPC_URL,
