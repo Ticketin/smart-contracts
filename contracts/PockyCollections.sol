@@ -23,8 +23,6 @@ contract PockyCollections is AccessControl {
     // —————— basic information
     /** The event name. */
     string name;
-    /** Category (e.g. Concert, Voucher) */
-    string category;
     /** ticket price */
     uint256 priceInETH;
 
@@ -41,18 +39,16 @@ contract PockyCollections is AccessControl {
     // - Upcoming: Date.now() > startDate
     // - Past (hidden): Date.now() >= endDate
 
-    /**
-     * the summary of the event date. shown in ticket image. (e.g. "May 25 - June 1")
-     * Need to be formatted in front-end because solidity doesn't have such function :cry:
-     */
-    string dateText;
     /** start date, in POSIX time (millis) */
     uint256 startDate;
     /** end date, in POSIX time (millis) */
     uint256 endDate;
     /** YYYYMMDD */
     string matchDate;
+
     // —————— metadata
+
+    TicketSVGMetadata ticketSvgMetadata;
 
     /** The summary of the location where the event held. shown in ticket image */
     string eventLocation;
@@ -69,11 +65,33 @@ contract PockyCollections is AccessControl {
     OracleResult eventResult;
   }
 
-  struct OracleMetadata {
+  struct TicketSVGMetadata {
+    // home team info
     string homeTeamName;
     string homeTeamSymbol;
     string homeTeamLogo;
     string homeTeamColor;
+
+    // away team info
+    string awayTeamName;
+    string awayTeamSymbol;
+    string awayTeamLogo;
+    string awayTeamColor;
+
+    /** QR Code URL. `https://pocky.deno.dev/api/qrcode/${collectionId}` */
+    string qrCodeUrl;
+
+    /** Only the day of week, in uppercase. e.g. `"WEDNESDAY,"` */
+    string dateLine1;
+
+    /** rest of the date, in uppercase. e.g. `"OCTOBER 20 PM 7:00"` */
+    string dateLine2;
+
+    /** Only the first comma, in uppercase. e.g. `"TD GARDEN,"` */
+    string locationLine1;
+
+    /** rest of the date, in uppercase. e.g. `"100 Legends Way, Boston, MA"` */
+    string locationLine2;
   }
 
   struct OracleResult {
@@ -146,24 +164,8 @@ contract PockyCollections is AccessControl {
    * @param collectionId the collection ID
    */
   function constructTokenURIOf(uint256 collectionId) external view returns (string memory) {
-    // TODO: ticket design needs to be changed.
     Collection storage collection = _collections[collectionId];
-    string memory image = Base64.encode(
-      bytes(
-        TicketSVGRenderer.renderSVG(
-          TicketSVGRenderer.SVGInput({
-            title: collection.name,
-            description1: collection.dateText,
-            description2: collection.eventLocation,
-            foregroundColor: 'white',
-            backgroundImage: 'black',
-            contentImage: collection.imageUrl,
-            hasResult: collection.updated,
-            resultText: collection.eventResult.homeScore
-          })
-        )
-      )
-    );
+    string memory image = Base64.encode(bytes(TicketSVGRenderer.renderSVG(collection)));
     return
       string(
         abi.encodePacked(
@@ -184,5 +186,10 @@ contract PockyCollections is AccessControl {
           )
         )
       );
+  }
+
+  function svgOf(uint256 collectionId) public view returns (string memory) {
+    Collection storage collection = _collections[collectionId];
+    return TicketSVGRenderer.renderSVG(collection);
   }
 }
