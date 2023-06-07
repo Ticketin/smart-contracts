@@ -83,6 +83,7 @@ const data = [
 module.exports = async ({ getNamedAccounts, ethers }) => {
   const { deployer } = await getNamedAccounts();
   const pockyCollections = await ethers.getContract('PockyCollections');
+  const ticket = await ethers.getContract('Ticket');
 
   // default values
   const price = 0.01;
@@ -109,10 +110,17 @@ module.exports = async ({ getNamedAccounts, ethers }) => {
 
     await pockyCollections.register(collection);
     console.log(
-      `- collection #${collectionId++} created: ${name} (${format(startDate, 'yyyyMMdd')} ~ ${format(
+      `- collection #${collectionId} created: ${name} (${format(startDate, 'yyyyMMdd')} ~ ${format(
         endDate,
         'yyyyMMdd',
       )})`,
     );
+
+    if (+endDate <= Date.now() || name === '2023 NBA Finals : Miami Heat at Denver') {
+      // mint an NFT to deployer wallet for past events & actual match results
+      await ticket.mint(collectionId, deployer);
+      console.log('  - minted an NFT to deployer wallet');
+    }
+    collectionId++;
   }
 };
