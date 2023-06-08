@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 import {Chainlink, ChainlinkClient, LinkTokenInterface} from '@chainlink/contracts/src/v0.8/ChainlinkClient.sol';
 import {ConfirmedOwner} from '@chainlink/contracts/src/v0.8/ConfirmedOwner.sol';
+import {Base64} from 'base64-sol/base64.sol';
 import {PockyCollections} from './PockyCollections.sol';
 
 contract PockyAPIConsumer is ChainlinkClient, ConfirmedOwner {
@@ -32,40 +33,10 @@ contract PockyAPIConsumer is ChainlinkClient, ConfirmedOwner {
    */
   function requestFetchMatchResult(uint256 collectionId) public returns (bytes32 requestId) {
     PockyCollections.Collection memory collection = collections.get(collectionId);
-    string memory pockySportResultApi = string(
-      abi.encodePacked('https://pocky.deno.dev/api/sport/nba/', collection.matchDate)
-    );
 
     Chainlink.Request memory req = buildChainlinkRequest(jobId, address(this), this.fulfill.selector);
-    req.add('getHomeScore', pockySportResultApi);
-    req.add('pathHomeScore', 'home,score');
-    req.add('getHomeFGM', pockySportResultApi);
-    req.add('pathHomeFGM', 'home,stats,fieldGoalsMade');
-    req.add('getHomeFGP', pockySportResultApi);
-    req.add('pathHomeFGP', 'home,stats,fieldGoalsPct');
-    req.add('getHomeTPM', pockySportResultApi);
-    req.add('pathHomeTPM', 'home,stats,threePointsMade');
-    req.add('getHomeTPP', pockySportResultApi);
-    req.add('pathHomeTPP', 'home,stats,threePointPct');
-    req.add('getHomeFTM', pockySportResultApi);
-    req.add('pathHomeFTM', 'home,stats,freeThrowsMade');
-    req.add('getHomeFTP', pockySportResultApi);
-    req.add('pathHomeFTP', 'home,stats,freeThrowPct');
-
-    req.add('getAwayScore', pockySportResultApi);
-    req.add('pathAwayScore', 'away,score');
-    req.add('getAwayFGM', pockySportResultApi);
-    req.add('pathAwayFGM', 'away,stats,fieldGoalsMade');
-    req.add('getAwayFGP', pockySportResultApi);
-    req.add('pathAwayFGP', 'away,stats,fieldGoalsPct');
-    req.add('getAwayTPM', pockySportResultApi);
-    req.add('pathAwayTPM', 'away,stats,threePointsMade');
-    req.add('getAwayTPP', pockySportResultApi);
-    req.add('pathAwayTPP', 'away,stats,threePointPct');
-    req.add('getAwayFTM', pockySportResultApi);
-    req.add('pathAwayFTM', 'away,stats,freeThrowsMade');
-    req.add('getAwayFTP', pockySportResultApi);
-    req.add('pathAwayFTP', 'away,stats,freeThrowPct');
+    req.add('get', string(abi.encodePacked('https://pocky.deno.dev/api/sport/nba/', collection.matchDate)));
+    req.add('path', 'oracleResultAbiData');
 
     requestId = sendChainlinkRequest(req, fee);
     requestIdToCollectionId[requestId] = collectionId;
@@ -73,47 +44,29 @@ contract PockyAPIConsumer is ChainlinkClient, ConfirmedOwner {
   }
 
   /**
-   * Receive the response in the form of uint256
+   * Receive the response from the Chainlink, and update the collection result.
    */
   function fulfill(
     bytes32 _requestId,
-    string memory homeScore,
-    string memory homeFGM,
-    string memory homeFGP,
-    string memory homeTPM,
-    string memory homeTPP,
-    string memory homeFTM,
-    string memory homeFTP
-  )
-    public
-    // string memory awayScore,
-    // string memory awayFGM,
-    // string memory awayFGP,
-    // string memory awayTPM,
-    // string memory awayTPP,
-    // string memory awayFTM
-    recordChainlinkFulfillment(_requestId)
-  {
-    collections.updateResult(
-      requestIdToCollectionId[_requestId],
-      PockyCollections.OracleResult({
-        homeScore: homeScore,
-        homeFGM: homeFGM,
-        homeFGP: homeFGP,
-        homeTPM: homeTPM,
-        homeTPP: homeTPP,
-        homeFTM: homeFTM,
-        homeFTP: homeFTP,
-        awayScore: '',
-        awayFGM: '',
-        awayFGP: '',
-        awayTPM: '',
-        awayTPP: '',
-        awayFTM: '',
-        awayFTP: ''
-        // awayFTP: awayFTP
-      })
+    string memory oracleResultAbiData
+  ) public recordChainlinkFulfillment(_requestId) {
+    updateEventResult(requestIdToCollectionId[_requestId], oracleResultAbiData);
+  }
+
+  /**
+   * Decodes the `oracleResultAbiData` from Pocky Sport API Proxy
+   * as a `PockyCollections.OracleResult` struct, and update the collection result.
+   *
+   * @param collectionId The collection you want to update
+   * @param oracleResultAbiData The result data from Pocky Sport API Proxy
+   */
+  function updateEventResult(uint256 collectionId, string memory oracleResultAbiData) public {
+    bytes memory decodedAbiData = Base64.decode(oracleResultAbiData);
+    PockyCollections.OracleResult memory result = abi.decode(
+      decodedAbiData,
+      (PockyCollections.OracleResult)
     );
+    collections.updateResult(collectionId, result);
   }
 
   /**
