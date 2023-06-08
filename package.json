@@ -5,6 +5,8 @@
     "prettier": "prettier --write 'contracts/**/*.sol'",
     "test": "REPORT_GAS=true hardhat test",
     "start": "NON_INTERACTIVE=1 concurrently \"hardhat node\" \"npm:deploy:localhost\"",
+    "deploy:polygon-mainnet": "hardhat deploy --network polygonMainnet",
+    "deploy:polygon-mumbai": "hardhat deploy --network polygonMumbai",
     "run-script": "npx hardhat run"
   },
   "devDependencies": {

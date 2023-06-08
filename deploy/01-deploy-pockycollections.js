@@ -6,7 +6,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   log('----------------------------------------------------');
   const ticketSVGRenderer = await deploy('TicketSVGRenderer', { from: deployer });
-  console.log('Deployed TicketSVGRenderer to:', ticketSVGRenderer.address);
+  if (ticketSVGRenderer.newlyDeployed) {
+    console.log('Deployed TicketSVGRenderer to:', ticketSVGRenderer.address);
+  }
 
   const deployResult = await deploy('PockyCollections', {
     from: deployer,

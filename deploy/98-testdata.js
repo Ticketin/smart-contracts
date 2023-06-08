@@ -92,6 +92,13 @@ module.exports = async ({ getNamedAccounts, ethers }) => {
 
   console.log('----------------------------------------------------');
   console.log('Registering test data to PockyCollections...');
+
+  const existing = await pockyCollections.get(0);
+  if (existing && typeof existing.name === 'string') {
+    console.log('skip registering test data since already done.');
+    return;
+  }
+
   let collectionId = 0;
   for (const { name, eventLocation, description, imageUrl, startDate, endDate, featured } of data) {
     const collection = await newCollection(

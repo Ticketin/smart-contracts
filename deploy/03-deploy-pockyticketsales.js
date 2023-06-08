@@ -14,9 +14,9 @@ module.exports = async ({ getNamedAccounts, deployments, ethers }) => {
   });
   if (deployResult.newlyDeployed) {
     log(`contract PockyTicketSales deployed at ${deployResult.address} using ${deployResult.receipt.gasUsed} gas`);
+    log(`granting Ticket.MINTER_ROLE to PockyTicketSales (${deployResult.address})`);
+    await pockyTicket.grantRole(await pockyTicket.MINTER_ROLE(), deployResult.address);
   }
-  log(`granting Ticket.MINTER_ROLE to PockyTicketSales (${deployResult.address})`);
-  await pockyTicket.grantRole(await pockyTicket.MINTER_ROLE(), deployResult.address);
 };
 
 module.exports.tags = ['PockyTicketSales'];

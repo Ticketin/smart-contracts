@@ -13,9 +13,9 @@ module.exports = async ({ getNamedAccounts, deployments, ethers }) => {
   });
   if (deployResult.newlyDeployed) {
     log(`contract PockyAPIConsumer deployed at ${deployResult.address} using ${deployResult.receipt.gasUsed} gas`);
+    log(`granting PockyAPIConsumer.RESULT_ORACLE_ROLE to PockyAPIConsumer (${deployResult.address})`);
+    await pockyCollections.grantRole(await pockyCollections.RESULT_ORACLE_ROLE(), deployResult.address);
   }
-  log(`granting PockyAPIConsumer.RESULT_ORACLE_ROLE to PockyAPIConsumer (${deployResult.address})`);
-  await pockyCollections.grantRole(await pockyCollections.RESULT_ORACLE_ROLE(), deployResult.address);
 };
 
 module.exports.tags = ['PockyAPIConsumer'];
