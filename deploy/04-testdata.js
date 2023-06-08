@@ -124,3 +124,4 @@ module.exports = async ({ getNamedAccounts, ethers }) => {
     collectionId++;
   }
 };
+module.exports.tags = ['Testdata'];

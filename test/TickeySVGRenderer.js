@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const { deployments, ethers } = require('hardhat');
 const { writeFile } = require('fs/promises');
 
@@ -82,10 +83,16 @@ describe('TickeySVGRenderer', () => {
       await collections.register(UPCOMING_EVENT_DATA);
       await collections.register(FINISHED_EVENT_DATA);
 
-      await writeFile('test-upcoming.svg', await collections.svgOf(0));
-      console.log('successfully write test-upcoming.svg');
+      const upcomingSvg = await collections.svgOf(0);
+      expect(upcomingSvg).to.match(/Upcoming/);
 
-      await writeFile('test-finished.svg', await collections.svgOf(1));
+      const finishedSvg = await collections.svgOf(1);
+      expect(finishedSvg).to.match(/Result/);
+      expect(finishedSvg).to.match(/52\.7\%/);
+
+      await writeFile('test-upcoming.svg', upcomingSvg);
+      await writeFile('test-finished.svg', finishedSvg);
+      console.log('successfully write test-upcoming.svg');
       console.log('successfully write test-finished.svg');
     });
   });

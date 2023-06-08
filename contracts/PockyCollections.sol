@@ -25,13 +25,10 @@ contract PockyCollections is AccessControl {
     string name;
     /** ticket price */
     uint256 priceInETH;
-
     /** the collection owner. only the owner can withdraw the revenue */
     address owner;
-
     /** the maximum count (mint cap) of tickets per a collection */
     uint256 maxSupply;
-
     // —————— date-related fields
     // NOTE: time-sensitive sections such as Now, Upcoming should be categorized in
     // the frontend by parsing startDate / endDate. Here are the cases:
@@ -45,11 +42,9 @@ contract PockyCollections is AccessControl {
     uint256 endDate;
     /** YYYYMMDD */
     string matchDate;
-
     // —————— metadata
 
     TicketSVGMetadata ticketSvgMetadata;
-
     /** The summary of the location where the event held. shown in ticket image */
     string eventLocation;
     /** Multi-line description shown in the detail page */
@@ -71,25 +66,19 @@ contract PockyCollections is AccessControl {
     string homeTeamSymbol;
     string homeTeamLogo;
     string homeTeamColor;
-
     // away team info
     string awayTeamName;
     string awayTeamSymbol;
     string awayTeamLogo;
     string awayTeamColor;
-
     /** QR Code URL. `https://pocky.deno.dev/api/qrcode/${collectionId}` */
     string qrCodeUrl;
-
     /** Only the day of week, in uppercase. e.g. `"WEDNESDAY,"` */
     string dateLine1;
-
     /** rest of the date, in uppercase. e.g. `"OCTOBER 20 PM 7:00"` */
     string dateLine2;
-
     /** Only the first comma, in uppercase. e.g. `"TD GARDEN,"` */
     string locationLine1;
-
     /** rest of the date, in uppercase. e.g. `"100 Legends Way, Boston, MA"` */
     string locationLine2;
   }
@@ -173,12 +162,11 @@ contract PockyCollections is AccessControl {
           Base64.encode(
             bytes(
               abi.encodePacked(
-                '{"name":"Pocky Ticket: ',
+                '{"name":"',
                 collection.name,
-                '", "description":"',
+                ' - Pocky dNFT Ticket", "description":"',
                 collection.description,
-                '", "image": "',
-                'data:image/svg+xml;base64,',
+                '", "animation_url": "https://pocky.deno.dev/render?svg=',
                 image,
                 '"}'
               )
