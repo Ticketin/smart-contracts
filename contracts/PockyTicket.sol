@@ -18,7 +18,7 @@ contract Ticket is ERC721Enumerable, AccessControl {
   /** @dev PockeyCollections contract, which is a module responsible for managing the dNFT metadata */
   PockyCollections public collections;
 
-  mapping(uint256 => uint256) private _tokenIdToCollectionId;
+  mapping(uint256 => uint256) public tokenIdToCollectionId;
   mapping(uint256 => uint256) private _totalSupplyPerCollectionId;
 
   constructor(PockyCollections _collections) ERC721Enumerable() ERC721(TOKEN_NAME, SYMBOL) {
@@ -41,7 +41,7 @@ contract Ticket is ERC721Enumerable, AccessControl {
 
     uint256 tokenId = totalSupply() + 1;
     _mint(to, tokenId);
-    _tokenIdToCollectionId[tokenId] = collectionId;
+    tokenIdToCollectionId[tokenId] = collectionId;
     _totalSupplyPerCollectionId[collectionId] += 1;
   }
 
@@ -53,13 +53,13 @@ contract Ticket is ERC721Enumerable, AccessControl {
    */
   function tokenURI(uint256 tokenId) public view override(ERC721) returns (string memory) {
     require(_exists(tokenId), 'URI query for nonexistent token');
-    return collections.constructTokenURIOf(_tokenIdToCollectionId[tokenId]);
+    return collections.constructTokenURIOf(tokenIdToCollectionId[tokenId]);
   }
 
   /** @dev returns the collection data of given token. */
   function collectionOf(uint256 tokenId) public view returns (PockyCollections.Collection memory) {
     require(_exists(tokenId), 'query for nonexistent token');
-    return collections.get(_tokenIdToCollectionId[tokenId]);
+    return collections.get(tokenIdToCollectionId[tokenId]);
   }
 
   /** @dev returns the total supply of the collection */
